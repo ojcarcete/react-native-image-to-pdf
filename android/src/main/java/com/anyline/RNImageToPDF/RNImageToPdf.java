@@ -47,19 +47,45 @@ public class RNImageToPdf extends ReactContextBaseJavaModule {
           try {
               ReadableArray imagePaths = imageObject.getArray("imagePaths");
               String documentName = imageObject.getString("name");
+              Boolean forceSinglePage = imageObject.getBoolean("forceSinglePage");
               Document document = new Document();
               File documentFile = getTempFile(documentName);
               PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(documentFile));
               writer.setCompressionLevel(0);
               document.open();
-  
-              for (int i = 0; i < imagePaths.size(); i++) {
-                  Image img = Image.getInstance(imagePaths.getString(i));
-                  document.setPageSize(img);
+
+              if (forceSinglePage) {
+                  float totalWidth = 0;
+                  float totalHeight = 0;
+
+                  for (int i = 0; i < imagePaths.size(); i++) {
+                      Image img = Image.getInstance(imagePaths.getString(i));
+                      totalWidth = Math.max(totalWidth, img.getPlainWidth());
+                      totalHeight += img.getPlainHeight();
+                  }
+
+                  Rectangle pageSize = new Rectangle(0, 0, totalWidth, totalHeight);
+                  document.setPageSize(pageSize);
                   document.newPage();
-                  img.setAbsolutePosition(0, 0);
-                  document.add(img);
+
+                  float offsetY = pageSize.getHeight();
+                  for (int i = 0; i < imagePaths.size(); i++) {
+                      Image img = Image.getInstance(imagePaths.getString(i));
+                      offsetY -= img.getPlainHeight();
+                      img.setAbsolutePosition(0, offsetY);
+                      document.add(img);
+                  }
               }
+              else {
+                  for (int i = 0; i < imagePaths.size(); i++) {
+                      Image img = Image.getInstance(imagePaths.getString(i));
+                      document.setPageSize(img);
+                      document.newPage();
+                      img.setAbsolutePosition(0, 0);
+                      document.add(img);
+                  }
+              }
+
               document.close();
   
               String filePath = documentFile.getPath();
