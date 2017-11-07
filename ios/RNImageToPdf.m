@@ -11,6 +11,7 @@
 @interface RNImageToPdf ()
 @property (strong, nonatomic) NSMutableArray *imageViewArray;
 @property (strong, nonatomic) NSMutableDictionary *resultDict;
+@property (nonatomic) BOOL forceSinglePage;
 
 @end
 
@@ -31,6 +32,7 @@ RCT_EXPORT_METHOD(createPDFbyImages:(NSDictionary *)options
     
     self.resultDict = [[NSMutableDictionary alloc] init];
     self.imageViewArray = [[NSMutableArray alloc] init];
+    self.forceSinglePage = [[options objectForKey:@"forceSinglePage"] boolValue];
     
     NSString *filename = [options objectForKey:@"name"];
     
@@ -51,16 +53,41 @@ RCT_EXPORT_METHOD(createPDFbyImages:(NSDictionary *)options
     UIImageView *firstImageView = self.imageViewArray.firstObject;
     //Start with pdf:
     NSMutableData *pdfData = [NSMutableData data];
-    //Start pdf context;
+    //Start pdf context:
     UIGraphicsBeginPDFContextToData(pdfData, firstImageView.bounds, nil);
     
-    CGContextRef pdfContext;
-    for (UIImageView *iv in self.imageViewArray) {
-        //Start new page with image bounds:
-        UIGraphicsBeginPDFPageWithInfo(iv.bounds, nil);
-        pdfContext = UIGraphicsGetCurrentContext();
-        //Render image layer to context:
-        [iv.layer renderInContext:pdfContext];
+    if (self.forceSinglePage) {
+        //Calculate dimensions for vertically merged images:
+        CGFloat totalWidth = 0;
+        CGFloat totalHeight = 0;
+        
+        for (UIImageView *iv in self.imageViewArray) {
+            totalWidth = MAX(iv.bounds.size.width, totalWidth);
+            totalHeight += iv.bounds.size.height;
+        }
+        
+        //Generate single page:
+        CGRect pageFrame = CGRectMake(0, 0, totalWidth, totalHeight);
+        CGContextRef pdfContext = UIGraphicsGetCurrentContext();
+        UIGraphicsBeginPDFPageWithInfo(pageFrame, nil);
+        
+        for (UIImageView *iv in self.imageViewArray) {
+            //Render image layer to context:
+            [iv.layer renderInContext:pdfContext];
+            //Translate context coordinates vertically:
+            CGFloat fixWhiteOffsetY = 1.0f;
+            CGContextTranslateCTM(pdfContext, 0, iv.bounds.size.height - fixWhiteOffsetY);
+        }
+    }
+    else {
+        CGContextRef pdfContext;
+        for (UIImageView *iv in self.imageViewArray) {
+            //Start new page with image bounds:
+            UIGraphicsBeginPDFPageWithInfo(iv.bounds, nil);
+            pdfContext = UIGraphicsGetCurrentContext();
+            //Render image layer to context:
+            [iv.layer renderInContext:pdfContext];
+        }
     }
     
     // remove PDF rendering context
