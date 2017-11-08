@@ -46,7 +46,7 @@ public class RNImageToPdf extends ReactContextBaseJavaModule {
   
           try {
               ReadableArray imagePaths = imageObject.getArray("imagePaths");
-              String documentName = imageObject.getString("name");
+              String documentName = imageObject.getString("name") + ".pdf";
               Boolean forceSinglePage = imageObject.getBoolean("forceSinglePage");
               Document document = new Document();
               File documentFile = getTempFile(documentName);
@@ -115,7 +115,13 @@ public class RNImageToPdf extends ReactContextBaseJavaModule {
       private File getTempFile(String name) throws Exception {
           try {
               File outputDir = getReactApplicationContext().getExternalCacheDir();
-              return File.createTempFile(name, ".pdf", outputDir);
+              File tempFile = new File(outputDir, name);
+
+              if (tempFile.exists()) {
+                  tempFile.delete();
+              }
+
+              return tempFile;
   
           } catch (Exception e) {
               throw new Exception(e);
