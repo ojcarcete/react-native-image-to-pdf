@@ -27,7 +27,7 @@ or
 #### Android
 
 1. Open up `android/app/src/main/java/[...]/MainActivity.java`
-  - Add `import RNImageToPDF.RNImageToPdfPackage;` to the imports at the top of the file
+  - Add `import com.anyline.RNImageToPDF.RNImageToPdfPackage;` to the imports at the top of the file
   - Add `new RNImageToPdfPackage()` to the list returned by the `getPackages()` method
 2. Append the following lines to `android/settings.gradle`:
   	```
