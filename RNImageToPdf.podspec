@@ -11,11 +11,10 @@ Pod::Spec.new do |s|
   s.license      = "MIT"
   s.author       = { package["author"]["name"] => package["author"]["email"] }
   s.platform     = :ios, "7.0"
-  s.source       = { :git => "https://github.com/author/RNImageToPdf.git", :tag => "master" }
-  s.source_files  = "RNImageToPdf/**/*.{h,m}"
+  s.source       = { :git => "https://github.com/frenberg/RNImageToPdf.git", :branch => "master" }
+  s.source_files  = "ios/**/*.{h,m}"
   s.requires_arc = true
 
   s.dependency "React"
-  #s.dependency "others"
 
 end
