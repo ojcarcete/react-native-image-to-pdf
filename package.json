@@ -1,6 +1,6 @@
 {
   "name": "react-native-image-to-pdf",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Converts images to a PDF file",
   "main": "index.js",
   "scripts": {
@@ -12,6 +12,6 @@
   "author": "Jonas Laux, Philipp Mueller",
   "license": "MIT",
   "peerDependencies": {
-    "react-native": "^0.41.2"
+    "react-native": "*"
   }
 }
