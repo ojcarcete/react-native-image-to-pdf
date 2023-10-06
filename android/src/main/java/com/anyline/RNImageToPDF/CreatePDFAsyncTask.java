@@ -14,7 +14,6 @@ import com.facebook.react.bridge.WritableMap;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 import static java.lang.String.format;
 
@@ -84,7 +83,7 @@ public class CreatePDFAsyncTask extends AsyncTask<Void, Void, WritableMap> {
             document.writeTo(new FileOutputStream(filePath));
 
             result.putString("filePath", filePath.getAbsolutePath());
-        } catch (IOException e) {
+        } catch (Exception e) {
             document.close();
             return null;
         }
